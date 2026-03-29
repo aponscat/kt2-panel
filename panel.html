@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KT2 Remote</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-2: #1a2340;
+      --text: #eaf0ff;
+      --muted: #9eb0d1;
+      --accent: #6ea8ff;
+      --ok: #3ddc97;
+      --warn: #ffb84d;
+      --danger: #ff6b6b;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #0b1020 0%, #11162a 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2, h3 { margin: 0 0 12px; }
+    p { margin: 0; color: var(--muted); }
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .title p { margin-top: 6px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 380px;
+      gap: 16px;
+      align-items: start;
+    }
+    .panel {
+      background: rgba(19, 26, 46, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+    .stack { display: grid; gap: 16px; }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="number"], input[type="color"], textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    button {
+      border: 0;
+      border-radius: 14px;
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.15s ease, opacity 0.15s ease;
+      font-weight: 600;
+    }
+    button:hover { background: #243056; }
+    button:active { transform: translateY(1px) scale(0.99); }
+    button.primary { background: var(--accent); color: #08111f; }
+    button.success { background: var(--ok); color: #072217; }
+    button.warn { background: var(--warn); color: #281600; }
+    button.danger { background: var(--danger); color: #2b0b0b; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .row > * { flex: 1; }
+    .status {
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #0f1730;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      word-break: break-word;
+    }
+    .small { font-size: 12px; color: var(--muted); }
+
+    .dpad {
+      display: grid;
+      grid-template-columns: 72px 72px 72px;
+      grid-template-rows: 72px 72px 72px;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .dpad button {
+      font-size: 28px;
+      padding: 0;
+      border-radius: 18px;
+    }
+    .dpad .empty { visibility: hidden; }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    .actions-grid button {
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.15;
+      min-height: 42px;
+    }
+
+    .color-tools {
+      display: grid;
+      gap: 10px;
+    }
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .swatch {
+      width: 100%;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+    }
+
+    .piano {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .key {
+      min-height: 120px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fafcff 0%, #dfe6f5 100%);
+      color: #121826;
+      font-weight: 700;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      padding-bottom: 10px;
+      position: relative;
+    }
+    .key.black {
+      background: linear-gradient(180deg, #2c3550 0%, #0e1424 100%);
+      color: #f1f5ff;
+      min-height: 80px;
+    }
+
+    .log {
+      max-height: 240px;
+      overflow: auto;
+      background: #0c1327;
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #d7e2ff;
+      white-space: pre-wrap;
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.02);
+    }
+    summary { cursor: pointer; font-weight: 600; }
+
+    @media (max-width: 1150px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="title">
+        <h1>KT2 Remote Control</h1>
+        <p>Panel estático para controlar el Kungfu Turtle KT2 desde el navegador.</p>
+      </div>
+      <div class="small">Usa la IP del KT2, por ejemplo <strong>http://192.168.1.36</strong></div>
+    </div>
+
+    <div class="grid">
+      <div class="stack">
+        <section class="panel">
+          <h2>Conexión</h2>
+          <div style="height:12px"></div>
+          <label for="baseUrl">IP o URL base del KT2</label>
+          <input id="baseUrl" type="text" value="http://192.168.1.36" placeholder="http://192.168.1.36" />
+          <div style="height:10px"></div>
+          <div class="row">
+            <button class="primary" id="saveIpBtn">Guardar</button>
+            <button id="pingBtn">Probar /py</button>
+          </div>
+          <div style="height:10px"></div>
+          <div class="status" id="status">Listo.</div>
+          <div style="height:10px"></div>
+          <p class="small">Nota: si sirves esta página desde otro dominio, el KT2 puede bloquear algunas llamadas por CORS. Lo ideal es abrirla en el mismo dispositivo conectado a la Wi‑Fi del robot. Si te da problemas, puedes lanzar un navegador con seguridad relajada o servir un pequeño proxy local.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Luces</h2>
+          <div style="height:12px"></div>
+          <div class="color-tools">
+            <div class="row">
+              <div>
+                <label for="colorPicker">Color</label>
+                <input id="colorPicker" type="color" value="#ff00ff" />
+              </div>
+              <div>
+                <label for="brightness">Brillo lógico (solo visual)</label>
+                <input id="brightness" type="number" min="1" max="100" value="100" />
+              </div>
+            </div>
+            <div class="row">
+              <button class="success" id="setColorBtn">Encender LEDs</button>
+              <button id="setRainbowBtn">Arcoíris</button>
+              <button class="danger" id="ledOffBtn">Apagar</button>
+            </div>
+            <div>
+              <label>Paleta rápida</label>
+              <div class="palette" id="palette"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Sonido</h2>
+          <div style="height:12px"></div>
+          <div class="row">
+            <button id="helloBtn">Hello</button>
+            <button id="fireBtn">Fire</button>
+            <button id="stopSoundBtn">Stop buzzer</button>
+          </div>
+          <div style="height:12px"></div>
+          <label>Piano</label>
+          <div class="piano" id="piano"></div>
+          <div style="height:12px"></div>
+          <label for="musicText">Música custom (car.buzzer.music)</label>
+          <textarea id="musicText">1 2 3 5 3 2 1</textarea>
+          <div style="height:10px"></div>
+          <div class="row">
+            <button id="playMusicBtn">Reproducir música</button>
+            <button id="playScaleBtn">Escala</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <h2>Movimiento</h2>
+          <p>Flechas para caminar y girar. También puedes usar el teclado: flechas, espacio y B.</p>
+          <div class="dpad">
+            <div class="empty"></div>
+            <button data-move="forward">↑</button>
+            <div class="empty"></div>
+            <button data-move="left">←</button>
+            <button id="stopBtn" class="warn">■</button>
+            <button data-move="right">→</button>
+            <div class="empty"></div>
+            <button data-move="backward">↓</button>
+            <div class="empty"></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="row">
+            <button id="standBtn">Reset postura</button>
+            <button id="barkBtn">Bark</button>
+            <button id="backflipBtn" class="danger">Back Flip</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Actions</h2>
+          <p>Botones compactos con acciones comunes del módulo <code>actions</code>.</p>
+          <div style="height:12px"></div>
+          <div class="actions-grid" id="actionsGrid"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Python rápido</h2>
+          <label for="pyCode">Enviar código a <code>/py</code></label>
+          <textarea id="pyCode">import car
+car.led.on(0x00ffff)</textarea>
+          <div style="height:10px"></div>
+          <div class="row">
+            <button id="runPyBtn" class="primary">Ejecutar</button>
+            <button id="resetBtn">machine.reset()</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <h2>Log</h2>
+          <div class="log" id="log"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Atajos de teclado</h2>
+          <div class="small">
+            ↑ avanzar<br>
+            ↓ retroceder<br>
+            ← girar izquierda<br>
+            → girar derecha<br>
+            espacio = parar<br>
+            B = bark<br>
+            F = back flip<br>
+            R = reset postura
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Notas</h2>
+          <details>
+            <summary>Cómo están hechas las llamadas</summary>
+            <div class="small" style="margin-top:10px">
+              La página usa el endpoint <code>/py</code> para ejecutar código Python embebido, por ejemplo <code>q.play(actions.back_flip(q), dly=0.1)</code> o <code>car.led.on(0xff0000)</code>.
+            </div>
+          </details>
+          <div style="height:10px"></div>
+          <details>
+            <summary>Compatibilidad</summary>
+            <div class="small" style="margin-top:10px">
+              Está preparada para el KT2 con las APIs no oficiales que has encontrado. Algunas acciones pueden variar según firmware.
+            </div>
+          </details>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultBase = localStorage.getItem('kt2_base') || 'http://192.168.1.36';
+    const el = (id) => document.getElementById(id);
+    const baseUrlInput = el('baseUrl');
+    const statusEl = el('status');
+    const logEl = el('log');
+    baseUrlInput.value = defaultBase;
+
+    const quickColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ffa500', '#00ff99', '#7c4dff', '#ff4da6', '#222222'];
+    const actionsList = [
+      ['Shake Hand', 'q.play(actions.shake_hand(q), dly=0.1)'],
+      ['Push', 'q.play(actions.push(q), dly=0.1)'],
+      ['Pounce', 'q.play(actions.pounce(q), dly=0.1)'],
+      ['Turn Over', 'q.play(actions.turn_over(q), dly=0.1)'],
+      ['Flip', 'q.play(actions.flip(q), dly=0.1)'],
+      ['Back Flip', 'q.play(actions.back_flip(q), dly=0.1)'],
+      ['Double Flip', 'q.play(actions.double_flip(q), dly=0.1)'],
+      ['Left Punch', 'q.play(actions.left_punch(q), dly=0.1)'],
+      ['Right Punch', 'q.play(actions.right_punch(q, y=1), dly=0.1)'],
+      ['Slide', 'q.play(actions.slide(q), dly=0.1)'],
+      ['Left Split', 'q.play(actions.left_split(q), dly=0.1)'],
+      ['Right Split', 'q.play(actions.right_split(q), dly=0.1)'],
+      ['Seesaw', 'q.play(actions.seesaw(q), dly=0.1)'],
+      ['Spring', 'q.play(actions.spring(q), dly=0.1)'],
+      ['Bark', 'q.play(actions.bark(q), dly=0.1)'],
+      ['Throw', 'q.play(actions.throw(q), dly=0.1)'],
+      ['Stand Low', 'q.play(q.f(0, 0, 0, 0, ofs=actions.ofs_stand_low), dly=0.1)'],
+      ['Head Up', 'q.play(q.f(0, 0, 0, 0, ofs=actions.ofs_head_up), dly=0.1)'],
+      ['Head Down', 'q.play(q.f(0, 0, 0, 0, ofs=actions.ofs_head_down), dly=0.1)'],
+      ['One Key Reset', 'actions.one_key_reset(q)']
+    ];
+    const notes = [
+      ['C', 261], ['D', 294], ['E', 329], ['F', 349], ['G', 392], ['A', 440], ['B', 494], ['C2', 523]
+    ];
+
+    function getBaseUrl() {
+      return baseUrlInput.value.trim().replace(/\/$/, '');
+    }
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.style.color = isError ? '#ffb3b3' : '#cfe1ff';
+    }
+
+    function log(msg) {
+      const ts = new Date().toLocaleTimeString();
+      logEl.textContent = `[${ts}] ${msg}\n` + logEl.textContent;
+    }
+
+    function saveBase() {
+      localStorage.setItem('kt2_base', getBaseUrl());
+      setStatus('IP guardada.');
+    }
+
+    function hexColorToInt(hex) {
+      return '0x' + hex.replace('#', '').toLowerCase();
+    }
+
+    async function sendPython(code, label = 'python') {
+      const base = getBaseUrl();
+      const url = `${base}/py`;
+      log(`→ ${label}: ${code}`);
+      try {
+        const body = new URLSearchParams({ code });
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString()
+        });
+        const text = await res.text();
+        setStatus(`${label} enviado (${res.status})` + (text ? ` · ${text.slice(0, 120)}` : ''));
+        log(`← ${res.status} ${text.slice(0, 300)}`);
+        return text;
+      } catch (err) {
+        setStatus(`Error: ${err.message}`, true);
+        log(`✖ ${err.message}`);
+        throw err;
+      }
+    }
+
+    function buildActionCode(actionCode) {
+      return `import car\nimport actions\n${actionCode}`;
+    }
+
+    async function move(direction) {
+      const codeMap = {
+        forward: 'q.play(actions.walk(q, ofs=actions.ofs_stand), 2, dly=0.1)',
+        backward: 'q.play(actions.walk(q, x=-1, ofs=actions.ofs_stand), 2, dly=0.1)',
+        left: 'actions.c_pivot(q, 25)',
+        right: 'actions.c_pivot(q, -25)'
+      };
+      await sendPython(buildActionCode(codeMap[direction]), `move:${direction}`);
+    }
+
+    async function setLedColor(hex) {
+      const color = hexColorToInt(hex);
+      await sendPython(`import car\ncar.led.on(${color})`, `led:${hex}`);
+    }
+
+    async function ledOff() {
+      await sendPython('import car\ncar.led.off()', 'led:off');
+    }
+
+    async function rainbow() {
+      const code = `import car\nimport time\ncolors=[0xff0000,0xffff00,0x00ff00,0x00ffff,0x0000ff,0xff00ff]\nfor s in range(10):\n    leds=[]\n    for i in range(10):\n        leds.append(colors[(i+s)%len(colors)])\n    car.led.on(leds)\n    time.sleep(0.08)`;
+      await sendPython(code, 'led:rainbow');
+    }
+
+    async function beep(freq, dur = 0.2) {
+      await sendPython(`import car\ncar.buzzer.freq(${freq}, ${dur})`, `buzzer:${freq}`);
+    }
+
+    function createPalette() {
+      const box = el('palette');
+      quickColors.forEach((hex) => {
+        const btn = document.createElement('button');
+        btn.className = 'swatch';
+        btn.style.background = hex;
+        btn.title = hex;
+        btn.addEventListener('click', () => {
+          el('colorPicker').value = hex;
+          setLedColor(hex);
+        });
+        box.appendChild(btn);
+      });
+    }
+
+    function createActions() {
+      const box = el('actionsGrid');
+      actionsList.forEach(([name, code]) => {
+        const btn = document.createElement('button');
+        btn.textContent = name;
+        btn.addEventListener('click', () => sendPython(buildActionCode(code), `action:${name}`));
+        box.appendChild(btn);
+      });
+    }
+
+    function createPiano() {
+      const box = el('piano');
+      notes.forEach(([name, freq]) => {
+        const btn = document.createElement('button');
+        btn.className = 'key';
+        btn.textContent = name;
+        btn.addEventListener('click', () => beep(freq, 0.25));
+        box.appendChild(btn);
+      });
+    }
+
+    function bindEvents() {
+      el('saveIpBtn').addEventListener('click', saveBase);
+      el('pingBtn').addEventListener('click', () => sendPython('print("pong")', 'ping'));
+      el('setColorBtn').addEventListener('click', () => setLedColor(el('colorPicker').value));
+      el('ledOffBtn').addEventListener('click', ledOff);
+      el('setRainbowBtn').addEventListener('click', rainbow);
+      el('helloBtn').addEventListener('click', () => sendPython('import car\ncar.buzzer.hello()', 'buzzer:hello'));
+      el('fireBtn').addEventListener('click', () => sendPython('import car\ncar.buzzer.fire()', 'buzzer:fire'));
+      el('stopSoundBtn').addEventListener('click', () => sendPython('import car\ncar.buzzer.close()', 'buzzer:close'));
+      el('playMusicBtn').addEventListener('click', () => {
+        const music = el('musicText').value.replace(/'''/g, "");
+        sendPython(`import car\ncar.buzzer.music('''${music}''')`, 'buzzer:music');
+      });
+      el('playScaleBtn').addEventListener('click', () => sendPython("import car\ncar.buzzer.music('''1 2 3 4 5 6 7 1''' )", 'buzzer:scale'));
+      el('runPyBtn').addEventListener('click', () => sendPython(el('pyCode').value, 'custom'));
+      el('resetBtn').addEventListener('click', () => sendPython('import machine\nmachine.reset()', 'reset'));
+      el('stopBtn').addEventListener('click', () => sendPython('import car\ncar.stop()', 'stop'));
+      el('standBtn').addEventListener('click', () => sendPython(buildActionCode('actions.one_key_reset(q)'), 'stand'));
+      el('barkBtn').addEventListener('click', () => sendPython(buildActionCode('q.play(actions.bark(q), dly=0.1)'), 'bark'));
+      el('backflipBtn').addEventListener('click', () => sendPython(buildActionCode('q.play(actions.back_flip(q), dly=0.1)'), 'backflip'));
+      document.querySelectorAll('[data-move]').forEach((btn) => {
+        btn.addEventListener('click', () => move(btn.dataset.move));
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'b', 'B', 'f', 'F', 'r', 'R'].includes(e.key)) {
+          e.preventDefault();
+        }
+        if (e.key === 'ArrowUp') move('forward');
+        if (e.key === 'ArrowDown') move('backward');
+        if (e.key === 'ArrowLeft') move('left');
+        if (e.key === 'ArrowRight') move('right');
+        if (e.key === ' ') sendPython('import car\ncar.stop()', 'stop');
+        if (e.key === 'b' || e.key === 'B') sendPython(buildActionCode('q.play(actions.bark(q), dly=0.1)'), 'bark');
+        if (e.key === 'f' || e.key === 'F') sendPython(buildActionCode('q.play(actions.back_flip(q), dly=0.1)'), 'backflip');
+        if (e.key === 'r' || e.key === 'R') sendPython(buildActionCode('actions.one_key_reset(q)'), 'reset-pose');
+      });
+    }
+
+    createPalette();
+    createActions();
+    createPiano();
+    bindEvents();
+    log('Interfaz lista.');
+  </script>
+</body>
+</html>
