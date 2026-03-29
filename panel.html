@@ -42,9 +42,15 @@
       margin-bottom: 18px;
     }
     .title p { margin-top: 6px; }
+    .top-tools {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
     .grid {
       display: grid;
-      grid-template-columns: 320px 1fr 380px;
+      grid-template-columns: minmax(280px, 320px) minmax(0, 1fr) minmax(300px, 380px);
       gap: 16px;
       align-items: start;
     }
@@ -55,15 +61,20 @@
       box-shadow: var(--shadow);
       padding: 16px;
       backdrop-filter: blur(10px);
+      min-width: 0;
     }
-    .stack { display: grid; gap: 16px; }
+    .stack {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+    }
     label {
       display: block;
       font-size: 13px;
       color: var(--muted);
       margin-bottom: 6px;
     }
-    input[type="text"], input[type="number"], input[type="color"], textarea, select {
+    input[type="number"], input[type="color"], textarea, select {
       width: 100%;
       border: 1px solid var(--border);
       background: var(--panel-2);
@@ -90,7 +101,10 @@
     button.warn { background: var(--warn); color: #281600; }
     button.danger { background: var(--danger); color: #2b0b0b; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .row > * { flex: 1; }
+    .row > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
     .status {
       font-size: 13px;
       padding: 10px 12px;
@@ -164,11 +178,6 @@
       padding-bottom: 10px;
       position: relative;
     }
-    .key.black {
-      background: linear-gradient(180deg, #2c3550 0%, #0e1424 100%);
-      color: #f1f5ff;
-      min-height: 80px;
-    }
 
     .log {
       max-height: 240px;
@@ -194,6 +203,26 @@
 
     @media (max-width: 1150px) {
       .grid { grid-template-columns: 1fr; }
+      .header { align-items: flex-start; }
+    }
+
+    @media (max-width: 1380px) {
+      .wrap { padding: 16px; }
+      .grid {
+        grid-template-columns: minmax(250px, 290px) minmax(0, 1fr) minmax(260px, 320px);
+      }
+      .actions-grid {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .palette { grid-template-columns: repeat(4, 1fr); }
+      .piano { grid-template-columns: repeat(4, 1fr); }
+      .dpad {
+        grid-template-columns: 64px 64px 64px;
+        grid-template-rows: 64px 64px 64px;
+      }
     }
   </style>
 </head>
@@ -201,82 +230,109 @@
   <div class="wrap">
     <div class="header">
       <div class="title">
-        <h1>KT2 Remote Control</h1>
-        <p>Panel estático para controlar el Kungfu Turtle KT2 desde el navegador.</p>
+        <h1 data-i18n="app_title">KT2 Remote Control</h1>
+        <p data-i18n="app_subtitle">Panel estático para controlar el Kungfu Turtle KT2 desde el navegador.</p>
       </div>
-      <div class="small">Usa la IP del KT2, por ejemplo <strong>http://192.168.1.36</strong></div>
+      <div class="top-tools">
+        <div>
+          <label for="languageSelect" data-i18n="language_label">Idioma</label>
+          <select id="languageSelect">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="hi">हिन्दी</option>
+            <option value="ar">العربية</option>
+            <option value="pt">Português</option>
+            <option value="bn">বাংলা</option>
+            <option value="ru">Русский</option>
+            <option value="ja">日本語</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
+            <option value="de">Deutsch</option>
+            <option value="jv">Basa Jawa</option>
+            <option value="ko">한국어</option>
+            <option value="fr">Français</option>
+            <option value="te">తెలుగు</option>
+            <option value="mr">मराठी</option>
+            <option value="tr">Türkçe</option>
+            <option value="ta">தமிழ்</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="ur">اردو</option>
+            <option value="ca">Català</option>
+            <option value="gl">Galego</option>
+            <option value="eu">Euskara</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="grid">
       <div class="stack">
         <section class="panel">
-          <h2>Conexión</h2>
+          <h2 data-i18n="connection_title">Conexión</h2>
           <div style="height:12px"></div>
-          <label for="baseUrl">IP o URL base del KT2</label>
-          <input id="baseUrl" type="text" value="http://192.168.1.36" placeholder="http://192.168.1.36" />
-          <div style="height:10px"></div>
           <div class="row">
-            <button class="primary" id="saveIpBtn">Guardar</button>
-            <button id="pingBtn">Probar /py</button>
+            <button id="pingBtn" class="primary" data-i18n="ping_button">Probar /py</button>
           </div>
           <div style="height:10px"></div>
           <div class="status" id="status">Listo.</div>
           <div style="height:10px"></div>
-          <p class="small">Nota: si sirves esta página desde otro dominio, el KT2 puede bloquear algunas llamadas por CORS. Lo ideal es abrirla en el mismo dispositivo conectado a la Wi‑Fi del robot. Si te da problemas, puedes lanzar un navegador con seguridad relajada o servir un pequeño proxy local.</p>
+          <p class="small" data-i18n="connection_note">
+            El panel usa llamadas relativas al ejecutarse desde el propio servidor del KT2.
+          </p>
         </section>
 
         <section class="panel">
-          <h2>Luces</h2>
+          <h2 data-i18n="lights_title">Luces</h2>
           <div style="height:12px"></div>
           <div class="color-tools">
             <div class="row">
               <div>
-                <label for="colorPicker">Color</label>
+                <label for="colorPicker" data-i18n="color_label">Color</label>
                 <input id="colorPicker" type="color" value="#ff00ff" />
               </div>
               <div>
-                <label for="brightness">Brillo lógico (solo visual)</label>
+                <label for="brightness" data-i18n="brightness_label">Brillo lógico (solo visual)</label>
                 <input id="brightness" type="number" min="1" max="100" value="100" />
               </div>
             </div>
             <div class="row">
-              <button class="success" id="setColorBtn">Encender LEDs</button>
-              <button id="setRainbowBtn">Arcoíris</button>
-              <button class="danger" id="ledOffBtn">Apagar</button>
+              <button class="success" id="setColorBtn" data-i18n="led_on">Encender LEDs</button>
+              <button id="setRainbowBtn" data-i18n="rainbow">Arcoíris</button>
+              <button class="danger" id="ledOffBtn" data-i18n="led_off">Apagar</button>
             </div>
             <div>
-              <label>Paleta rápida</label>
+              <label data-i18n="quick_palette">Paleta rápida</label>
               <div class="palette" id="palette"></div>
             </div>
           </div>
         </section>
 
         <section class="panel">
-          <h2>Sonido</h2>
+          <h2 data-i18n="sound_title">Sonido</h2>
           <div style="height:12px"></div>
           <div class="row">
             <button id="helloBtn">Hello</button>
             <button id="fireBtn">Fire</button>
-            <button id="stopSoundBtn">Stop buzzer</button>
+            <button id="stopSoundBtn" data-i18n="stop_buzzer">Stop buzzer</button>
           </div>
           <div style="height:12px"></div>
-          <label>Piano</label>
+          <label data-i18n="piano_label">Piano</label>
           <div class="piano" id="piano"></div>
           <div style="height:12px"></div>
-          <label for="musicText">Música custom (car.buzzer.music)</label>
+          <label for="musicText" data-i18n="music_custom">Música custom (car.buzzer.music)</label>
           <textarea id="musicText">1 2 3 5 3 2 1</textarea>
           <div style="height:10px"></div>
           <div class="row">
-            <button id="playMusicBtn">Reproducir música</button>
-            <button id="playScaleBtn">Escala</button>
+            <button id="playMusicBtn" data-i18n="play_music">Reproducir música</button>
+            <button id="playScaleBtn" data-i18n="play_scale">Escala</button>
           </div>
         </section>
       </div>
 
       <div class="stack">
         <section class="panel">
-          <h2>Movimiento</h2>
-          <p>Flechas para caminar y girar. También puedes usar el teclado: flechas, espacio y B.</p>
+          <h2 data-i18n="movement_title">Movimiento</h2>
+          <p data-i18n="movement_help">Flechas para caminar y girar. También puedes usar el teclado: flechas, espacio y B.</p>
           <div class="dpad">
             <div class="empty"></div>
             <button data-move="forward">↑</button>
@@ -290,27 +346,27 @@
           </div>
           <div style="height:12px"></div>
           <div class="row">
-            <button id="standBtn">Reset postura</button>
+            <button id="standBtn" data-i18n="reset_pose">Reset postura</button>
             <button id="barkBtn">Bark</button>
             <button id="backflipBtn" class="danger">Back Flip</button>
           </div>
         </section>
 
         <section class="panel">
-          <h2>Actions</h2>
-          <p>Botones compactos con acciones comunes del módulo <code>actions</code>.</p>
+          <h2 data-i18n="actions_title">Actions</h2>
+          <p data-i18n="actions_help">Botones compactos con acciones comunes del módulo actions.</p>
           <div style="height:12px"></div>
           <div class="actions-grid" id="actionsGrid"></div>
         </section>
 
         <section class="panel">
-          <h2>Python rápido</h2>
-          <label for="pyCode">Enviar código a <code>/py</code></label>
+          <h2 data-i18n="python_title">Python rápido</h2>
+          <label for="pyCode" data-i18n="python_label">Enviar código a /py</label>
           <textarea id="pyCode">import car
 car.led.on(0x00ffff)</textarea>
           <div style="height:10px"></div>
           <div class="row">
-            <button id="runPyBtn" class="primary">Ejecutar</button>
+            <button id="runPyBtn" class="primary" data-i18n="run_button">Ejecutar</button>
             <button id="resetBtn">machine.reset()</button>
           </div>
         </section>
@@ -318,13 +374,13 @@ car.led.on(0x00ffff)</textarea>
 
       <div class="stack">
         <section class="panel">
-          <h2>Log</h2>
+          <h2 data-i18n="log_title">Log</h2>
           <div class="log" id="log"></div>
         </section>
 
         <section class="panel">
-          <h2>Atajos de teclado</h2>
-          <div class="small">
+          <h2 data-i18n="shortcuts_title">Atajos de teclado</h2>
+          <div class="small" data-i18n-html="shortcuts_html">
             ↑ avanzar<br>
             ↓ retroceder<br>
             ← girar izquierda<br>
@@ -337,17 +393,17 @@ car.led.on(0x00ffff)</textarea>
         </section>
 
         <section class="panel">
-          <h2>Notas</h2>
+          <h2 data-i18n="notes_title">Notas</h2>
           <details>
-            <summary>Cómo están hechas las llamadas</summary>
-            <div class="small" style="margin-top:10px">
-              La página usa el endpoint <code>/py</code> para ejecutar código Python embebido, por ejemplo <code>q.play(actions.back_flip(q), dly=0.1)</code> o <code>car.led.on(0xff0000)</code>.
+            <summary data-i18n="notes_calls">Cómo están hechas las llamadas</summary>
+            <div class="small" style="margin-top:10px" data-i18n="notes_calls_body">
+              La página usa el endpoint /py para ejecutar código Python embebido, por ejemplo q.play(actions.back_flip(q), dly=0.1) o car.led.on(0xff0000).
             </div>
           </details>
           <div style="height:10px"></div>
           <details>
-            <summary>Compatibilidad</summary>
-            <div class="small" style="margin-top:10px">
+            <summary data-i18n="compatibility">Compatibilidad</summary>
+            <div class="small" style="margin-top:10px" data-i18n="compatibility_body">
               Está preparada para el KT2 con las APIs no oficiales que has encontrado. Algunas acciones pueden variar según firmware.
             </div>
           </details>
@@ -357,12 +413,10 @@ car.led.on(0x00ffff)</textarea>
   </div>
 
   <script>
-    const defaultBase = localStorage.getItem('kt2_base') || 'http://192.168.1.36';
     const el = (id) => document.getElementById(id);
-    const baseUrlInput = el('baseUrl');
     const statusEl = el('status');
     const logEl = el('log');
-    baseUrlInput.value = defaultBase;
+    const languageSelect = el('languageSelect');
 
     const quickColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ffa500', '#00ff99', '#7c4dff', '#ff4da6', '#222222'];
     const actionsList = [
@@ -391,8 +445,961 @@ car.led.on(0x00ffff)</textarea>
       ['C', 261], ['D', 294], ['E', 329], ['F', 349], ['G', 392], ['A', 440], ['B', 494], ['C2', 523]
     ];
 
-    function getBaseUrl() {
-      return baseUrlInput.value.trim().replace(/\/$/, '');
+    const translations = {
+      es: {
+        app_title: 'KT2 Remote Control',
+        app_subtitle: 'Panel estático para controlar el Kungfu Turtle KT2 desde el navegador.',
+        language_label: 'Idioma',
+        connection_title: 'Conexión',
+        ping_button: 'Probar /py',
+        connection_note: 'El panel usa llamadas relativas al ejecutarse desde el propio servidor del KT2.',
+        lights_title: 'Luces',
+        color_label: 'Color',
+        brightness_label: 'Brillo lógico (solo visual)',
+        led_on: 'Encender LEDs',
+        rainbow: 'Arcoíris',
+        led_off: 'Apagar',
+        quick_palette: 'Paleta rápida',
+        sound_title: 'Sonido',
+        stop_buzzer: 'Parar zumbador',
+        piano_label: 'Piano',
+        music_custom: 'Música personalizada (car.buzzer.music)',
+        play_music: 'Reproducir música',
+        play_scale: 'Escala',
+        movement_title: 'Movimiento',
+        movement_help: 'Flechas para caminar y girar. También puedes usar el teclado: flechas, espacio y B.',
+        reset_pose: 'Reset postura',
+        actions_title: 'Acciones',
+        actions_help: 'Botones compactos con acciones comunes del módulo actions.',
+        python_title: 'Python rápido',
+        python_label: 'Enviar código a /py',
+        run_button: 'Ejecutar',
+        log_title: 'Log',
+        shortcuts_title: 'Atajos de teclado',
+        shortcuts_html: '↑ avanzar<br>↓ retroceder<br>← girar izquierda<br>→ girar derecha<br>espacio = parar<br>B = bark<br>F = back flip<br>R = reset postura',
+        notes_title: 'Notas',
+        notes_calls: 'Cómo están hechas las llamadas',
+        notes_calls_body: 'La página usa el endpoint /py para ejecutar código Python embebido, por ejemplo q.play(actions.back_flip(q), dly=0.1) o car.led.on(0xff0000).',
+        compatibility: 'Compatibilidad',
+        compatibility_body: 'Está preparada para el KT2 con las APIs no oficiales que has encontrado. Algunas acciones pueden variar según firmware.',
+        ready: 'Listo.',
+        saved: 'Idioma guardado.',
+        sent: 'enviado'
+      },
+      en: {
+        app_title: 'KT2 Remote Control',
+        app_subtitle: 'Static panel to control the Kungfu Turtle KT2 from the browser.',
+        language_label: 'Language',
+        connection_title: 'Connection',
+        ping_button: 'Test /py',
+        connection_note: 'The panel uses relative calls when executed from the KT2 server itself.',
+        lights_title: 'Lights',
+        color_label: 'Color',
+        brightness_label: 'Logical brightness (visual only)',
+        led_on: 'Turn LEDs on',
+        rainbow: 'Rainbow',
+        led_off: 'Turn off',
+        quick_palette: 'Quick palette',
+        sound_title: 'Sound',
+        stop_buzzer: 'Stop buzzer',
+        piano_label: 'Piano',
+        music_custom: 'Custom music (car.buzzer.music)',
+        play_music: 'Play music',
+        play_scale: 'Scale',
+        movement_title: 'Movement',
+        movement_help: 'Arrows to walk and turn. You can also use the keyboard: arrows, space and B.',
+        reset_pose: 'Reset pose',
+        actions_title: 'Actions',
+        actions_help: 'Compact buttons with common actions from the actions module.',
+        python_title: 'Quick Python',
+        python_label: 'Send code to /py',
+        run_button: 'Run',
+        log_title: 'Log',
+        shortcuts_title: 'Keyboard shortcuts',
+        shortcuts_html: '↑ move forward<br>↓ move backward<br>← turn left<br>→ turn right<br>space = stop<br>B = bark<br>F = back flip<br>R = reset pose',
+        notes_title: 'Notes',
+        notes_calls: 'How calls are made',
+        notes_calls_body: 'This page uses the /py endpoint to execute embedded Python code, for example q.play(actions.back_flip(q), dly=0.1) or car.led.on(0xff0000).',
+        compatibility: 'Compatibility',
+        compatibility_body: 'Prepared for KT2 with the unofficial APIs you found. Some actions may vary depending on firmware.',
+        ready: 'Ready.',
+        saved: 'Language saved.',
+        sent: 'sent'
+      },
+      zh: {
+        app_title: 'KT2 遥控面板',
+        app_subtitle: '通过浏览器控制 Kungfu Turtle KT2 的静态面板。',
+        language_label: '语言',
+        connection_title: '连接',
+        ping_button: '测试 /py',
+        connection_note: '该面板在 KT2 服务器上运行时使用相对调用。',
+        lights_title: '灯光',
+        color_label: '颜色',
+        brightness_label: '逻辑亮度（仅视觉）',
+        led_on: '打开 LED',
+        rainbow: '彩虹',
+        led_off: '关闭',
+        quick_palette: '快捷调色板',
+        sound_title: '声音',
+        stop_buzzer: '停止蜂鸣器',
+        piano_label: '钢琴',
+        music_custom: '自定义音乐 (car.buzzer.music)',
+        play_music: '播放音乐',
+        play_scale: '音阶',
+        movement_title: '移动',
+        movement_help: '使用方向键行走和转向。你也可以使用键盘：方向键、空格和 B。',
+        reset_pose: '重置姿态',
+        actions_title: '动作',
+        actions_help: '包含 actions 模块常用动作的紧凑按钮。',
+        python_title: '快速 Python',
+        python_label: '发送代码到 /py',
+        run_button: '执行',
+        log_title: '日志',
+        shortcuts_title: '键盘快捷键',
+        shortcuts_html: '↑ 前进<br>↓ 后退<br>← 左转<br>→ 右转<br>空格 = 停止<br>B = 吠叫<br>F = 后空翻<br>R = 重置姿态',
+        notes_title: '说明',
+        notes_calls: '调用方式',
+        notes_calls_body: '此页面使用 /py 端点执行嵌入式 Python 代码，例如 q.play(actions.back_flip(q), dly=0.1) 或 car.led.on(0xff0000)。',
+        compatibility: '兼容性',
+        compatibility_body: '已针对你找到的 KT2 非官方 API 进行适配。某些动作可能因固件而异。',
+        ready: '就绪。',
+        saved: '语言已保存。',
+        sent: '已发送'
+      },
+      hi: {
+        app_title: 'KT2 रिमोट कंट्रोल',
+        app_subtitle: 'ब्राउज़र से Kungfu Turtle KT2 को नियंत्रित करने के लिए स्थिर पैनल।',
+        language_label: 'भाषा',
+        connection_title: 'कनेक्शन',
+        ping_button: '/py जाँचें',
+        connection_note: 'यह पैनल KT2 सर्वर पर चलने पर relative calls का उपयोग करता है।',
+        lights_title: 'लाइट्स',
+        color_label: 'रंग',
+        brightness_label: 'तार्किक चमक (केवल दृश्य)',
+        led_on: 'LED चालू करें',
+        rainbow: 'इंद्रधनुष',
+        led_off: 'बंद करें',
+        quick_palette: 'त्वरित पैलेट',
+        sound_title: 'ध्वनि',
+        stop_buzzer: 'बज़र रोकें',
+        piano_label: 'पियानो',
+        music_custom: 'कस्टम संगीत (car.buzzer.music)',
+        play_music: 'संगीत चलाएँ',
+        play_scale: 'स्केल',
+        movement_title: 'गतिविधि',
+        movement_help: 'चलने और मुड़ने के लिए तीर कुंजियाँ। आप कीबोर्ड भी उपयोग कर सकते हैं: तीर, स्पेस और B।',
+        reset_pose: 'पोज़ रीसेट',
+        actions_title: 'क्रियाएँ',
+        actions_help: 'actions मॉड्यूल की सामान्य क्रियाओं वाले कॉम्पैक्ट बटन।',
+        python_title: 'त्वरित Python',
+        python_label: '/py पर कोड भेजें',
+        run_button: 'चलाएँ',
+        log_title: 'लॉग',
+        shortcuts_title: 'कीबोर्ड शॉर्टकट',
+        shortcuts_html: '↑ आगे बढ़ें<br>↓ पीछे जाएँ<br>← बाएँ मुड़ें<br>→ दाएँ मुड़ें<br>स्पेस = रुकें<br>B = भौंकना<br>F = बैक फ्लिप<br>R = पोज़ रीसेट',
+        notes_title: 'नोट्स',
+        notes_calls: 'कॉल कैसे की जाती हैं',
+        notes_calls_body: 'यह पेज /py endpoint का उपयोग embedded Python code चलाने के लिए करता है, जैसे q.play(actions.back_flip(q), dly=0.1) या car.led.on(0xff0000)।',
+        compatibility: 'संगतता',
+        compatibility_body: 'यह KT2 के लिए उन अनौपचारिक APIs के साथ तैयार है जिन्हें आपने पाया है। कुछ क्रियाएँ firmware के अनुसार बदल सकती हैं।',
+        ready: 'तैयार।',
+        saved: 'भाषा सहेजी गई।',
+        sent: 'भेजा गया'
+      },
+      ar: {
+        app_title: 'لوحة التحكم KT2',
+        app_subtitle: 'لوحة ثابتة للتحكم في Kungfu Turtle KT2 من المتصفح.',
+        language_label: 'اللغة',
+        connection_title: 'الاتصال',
+        ping_button: 'اختبار /py',
+        connection_note: 'تستخدم اللوحة طلبات نسبية عند تشغيلها من خادم KT2 نفسه.',
+        lights_title: 'الأضواء',
+        color_label: 'اللون',
+        brightness_label: 'السطوع المنطقي (مرئي فقط)',
+        led_on: 'تشغيل LED',
+        rainbow: 'قوس قزح',
+        led_off: 'إيقاف',
+        quick_palette: 'لوحة ألوان سريعة',
+        sound_title: 'الصوت',
+        stop_buzzer: 'إيقاف الجرس',
+        piano_label: 'بيانو',
+        music_custom: 'موسيقى مخصصة (car.buzzer.music)',
+        play_music: 'تشغيل الموسيقى',
+        play_scale: 'السلم',
+        movement_title: 'الحركة',
+        movement_help: 'استخدم الأسهم للمشي والدوران. يمكنك أيضًا استخدام لوحة المفاتيح: الأسهم والمسافة و B.',
+        reset_pose: 'إعادة ضبط الوضعية',
+        actions_title: 'الإجراءات',
+        actions_help: 'أزرار مدمجة تحتوي على إجراءات شائعة من وحدة actions.',
+        python_title: 'Python سريع',
+        python_label: 'إرسال كود إلى /py',
+        run_button: 'تشغيل',
+        log_title: 'السجل',
+        shortcuts_title: 'اختصارات لوحة المفاتيح',
+        shortcuts_html: '↑ تقدم<br>↓ تراجع<br>← انعطف يسارًا<br>→ انعطف يمينًا<br>مسافة = توقف<br>B = نباح<br>F = قلبة خلفية<br>R = إعادة ضبط الوضعية',
+        notes_title: 'ملاحظات',
+        notes_calls: 'كيفية تنفيذ الطلبات',
+        notes_calls_body: 'تستخدم الصفحة نقطة النهاية /py لتنفيذ كود Python مضمّن، مثل q.play(actions.back_flip(q), dly=0.1) أو car.led.on(0xff0000).',
+        compatibility: 'التوافق',
+        compatibility_body: 'الصفحة مهيأة لـ KT2 باستخدام الواجهات غير الرسمية التي وجدتها. قد تختلف بعض الإجراءات حسب البرنامج الثابت.',
+        ready: 'جاهز.',
+        saved: 'تم حفظ اللغة.',
+        sent: 'تم الإرسال'
+      },
+      pt: {
+        app_title: 'Controle Remoto KT2',
+        app_subtitle: 'Painel estático para controlar o Kungfu Turtle KT2 a partir do navegador.',
+        language_label: 'Idioma',
+        connection_title: 'Conexão',
+        ping_button: 'Testar /py',
+        connection_note: 'O painel usa chamadas relativas quando é executado no próprio servidor do KT2.',
+        lights_title: 'Luzes',
+        color_label: 'Cor',
+        brightness_label: 'Brilho lógico (apenas visual)',
+        led_on: 'Ligar LEDs',
+        rainbow: 'Arco-íris',
+        led_off: 'Desligar',
+        quick_palette: 'Paleta rápida',
+        sound_title: 'Som',
+        stop_buzzer: 'Parar buzzer',
+        piano_label: 'Piano',
+        music_custom: 'Música personalizada (car.buzzer.music)',
+        play_music: 'Reproduzir música',
+        play_scale: 'Escala',
+        movement_title: 'Movimento',
+        movement_help: 'Setas para caminhar e girar. Também podes usar o teclado: setas, espaço e B.',
+        reset_pose: 'Repor postura',
+        actions_title: 'Ações',
+        actions_help: 'Botões compactos com ações comuns do módulo actions.',
+        python_title: 'Python rápido',
+        python_label: 'Enviar código para /py',
+        run_button: 'Executar',
+        log_title: 'Log',
+        shortcuts_title: 'Atalhos de teclado',
+        shortcuts_html: '↑ avançar<br>↓ recuar<br>← virar à esquerda<br>→ virar à direita<br>espaço = parar<br>B = bark<br>F = back flip<br>R = repor postura',
+        notes_title: 'Notas',
+        notes_calls: 'Como as chamadas são feitas',
+        notes_calls_body: 'A página usa o endpoint /py para executar código Python embutido, por exemplo q.play(actions.back_flip(q), dly=0.1) ou car.led.on(0xff0000).',
+        compatibility: 'Compatibilidade',
+        compatibility_body: 'Preparado para o KT2 com as APIs não oficiais que encontraste. Algumas ações podem variar conforme o firmware.',
+        ready: 'Pronto.',
+        saved: 'Idioma guardado.',
+        sent: 'enviado'
+      },
+      bn: {
+        app_title: 'KT2 রিমোট কন্ট্রোল',
+        app_subtitle: 'ব্রাউজার থেকে Kungfu Turtle KT2 নিয়ন্ত্রণের জন্য স্ট্যাটিক প্যানেল।',
+        language_label: 'ভাষা',
+        connection_title: 'সংযোগ',
+        ping_button: '/py পরীক্ষা করুন',
+        connection_note: 'প্যানেলটি KT2 সার্ভারেই চললে relative call ব্যবহার করে।',
+        lights_title: 'লাইট',
+        color_label: 'রং',
+        brightness_label: 'লজিক্যাল উজ্জ্বলতা (শুধু ভিজ্যুয়াল)',
+        led_on: 'LED চালু করুন',
+        rainbow: 'রংধনু',
+        led_off: 'বন্ধ করুন',
+        quick_palette: 'দ্রুত প্যালেট',
+        sound_title: 'শব্দ',
+        stop_buzzer: 'বাজার বন্ধ করুন',
+        piano_label: 'পিয়ানো',
+        music_custom: 'কাস্টম সঙ্গীত (car.buzzer.music)',
+        play_music: 'সঙ্গীত চালান',
+        play_scale: 'স্কেল',
+        movement_title: 'চলন',
+        movement_help: 'হাঁটা ও ঘোরার জন্য অ্যারো কী ব্যবহার করুন। কিবোর্ডের অ্যারো, স্পেস এবং B-ও ব্যবহার করতে পারেন।',
+        reset_pose: 'ভঙ্গি রিসেট',
+        actions_title: 'অ্যাকশন',
+        actions_help: 'actions মডিউলের সাধারণ কাজের জন্য কমপ্যাক্ট বোতাম।',
+        python_title: 'দ্রুত Python',
+        python_label: '/py-এ কোড পাঠান',
+        run_button: 'চালান',
+        log_title: 'লগ',
+        shortcuts_title: 'কিবোর্ড শর্টকাট',
+        shortcuts_html: '↑ সামনে যান<br>↓ পিছনে যান<br>← বামে ঘুরুন<br>→ ডানে ঘুরুন<br>space = থামুন<br>B = bark<br>F = back flip<br>R = ভঙ্গি রিসেট',
+        notes_title: 'নোট',
+        notes_calls: 'কল কীভাবে করা হয়',
+        notes_calls_body: 'এই পৃষ্ঠা embedded Python code চালাতে /py endpoint ব্যবহার করে, যেমন q.play(actions.back_flip(q), dly=0.1) বা car.led.on(0xff0000)।',
+        compatibility: 'সামঞ্জস্য',
+        compatibility_body: 'আপনি যে অননুমোদিত API পেয়েছেন, সেগুলোর সাথে KT2-এর জন্য এটি প্রস্তুত। কিছু অ্যাকশন firmware অনুযায়ী বদলাতে পারে।',
+        ready: 'প্রস্তুত।',
+        saved: 'ভাষা সংরক্ষিত হয়েছে।',
+        sent: 'পাঠানো হয়েছে'
+      },
+      ru: {
+        app_title: 'Пульт управления KT2',
+        app_subtitle: 'Статическая панель для управления Kungfu Turtle KT2 из браузера.',
+        language_label: 'Язык',
+        connection_title: 'Подключение',
+        ping_button: 'Проверить /py',
+        connection_note: 'Панель использует относительные вызовы при запуске на самом сервере KT2.',
+        lights_title: 'Подсветка',
+        color_label: 'Цвет',
+        brightness_label: 'Логическая яркость (только визуально)',
+        led_on: 'Включить LED',
+        rainbow: 'Радуга',
+        led_off: 'Выключить',
+        quick_palette: 'Быстрая палитра',
+        sound_title: 'Звук',
+        stop_buzzer: 'Остановить зуммер',
+        piano_label: 'Пианино',
+        music_custom: 'Пользовательская музыка (car.buzzer.music)',
+        play_music: 'Воспроизвести музыку',
+        play_scale: 'Гамма',
+        movement_title: 'Движение',
+        movement_help: 'Стрелки для ходьбы и поворота. Также можно использовать клавиатуру: стрелки, пробел и B.',
+        reset_pose: 'Сбросить позу',
+        actions_title: 'Действия',
+        actions_help: 'Компактные кнопки с типичными действиями модуля actions.',
+        python_title: 'Быстрый Python',
+        python_label: 'Отправить код в /py',
+        run_button: 'Выполнить',
+        log_title: 'Лог',
+        shortcuts_title: 'Горячие клавиши',
+        shortcuts_html: '↑ вперед<br>↓ назад<br>← поворот влево<br>→ поворот вправо<br>пробел = стоп<br>B = лай<br>F = сальто назад<br>R = сброс позы',
+        notes_title: 'Примечания',
+        notes_calls: 'Как выполняются вызовы',
+        notes_calls_body: 'Страница использует endpoint /py для выполнения встроенного Python-кода, например q.play(actions.back_flip(q), dly=0.1) или car.led.on(0xff0000).',
+        compatibility: 'Совместимость',
+        compatibility_body: 'Подготовлено для KT2 с неофициальными API, которые вы нашли. Некоторые действия могут отличаться в зависимости от прошивки.',
+        ready: 'Готово.',
+        saved: 'Язык сохранён.',
+        sent: 'отправлено'
+      },
+      ja: {
+        app_title: 'KT2 リモートコントロール',
+        app_subtitle: 'ブラウザから Kungfu Turtle KT2 を操作するための静的パネルです。',
+        language_label: '言語',
+        connection_title: '接続',
+        ping_button: '/py をテスト',
+        connection_note: 'このパネルは KT2 サーバー上で実行されるとき、相対呼び出しを使用します。',
+        lights_title: 'ライト',
+        color_label: '色',
+        brightness_label: '論理的な明るさ（表示のみ）',
+        led_on: 'LED を点灯',
+        rainbow: 'レインボー',
+        led_off: '消灯',
+        quick_palette: 'クイックパレット',
+        sound_title: 'サウンド',
+        stop_buzzer: 'ブザー停止',
+        piano_label: 'ピアノ',
+        music_custom: 'カスタム音楽 (car.buzzer.music)',
+        play_music: '音楽を再生',
+        play_scale: '音階',
+        movement_title: '移動',
+        movement_help: '矢印キーで歩行と方向転換ができます。キーボードの矢印、スペース、B も使えます。',
+        reset_pose: '姿勢をリセット',
+        actions_title: 'アクション',
+        actions_help: 'actions モジュールの一般的な動作をまとめたコンパクトなボタンです。',
+        python_title: 'クイック Python',
+        python_label: '/py にコードを送信',
+        run_button: '実行',
+        log_title: 'ログ',
+        shortcuts_title: 'キーボードショートカット',
+        shortcuts_html: '↑ 前進<br>↓ 後退<br>← 左に回転<br>→ 右に回転<br>スペース = 停止<br>B = bark<br>F = バックフリップ<br>R = 姿勢リセット',
+        notes_title: 'メモ',
+        notes_calls: '呼び出し方法',
+        notes_calls_body: 'このページは /py エンドポイントを使って埋め込み Python コードを実行します。たとえば q.play(actions.back_flip(q), dly=0.1) や car.led.on(0xff0000) です。',
+        compatibility: '互換性',
+        compatibility_body: '見つかった非公式 API を使う KT2 向けに準備されています。一部のアクションはファームウェアによって異なる場合があります。',
+        ready: '準備完了。',
+        saved: '言語を保存しました。',
+        sent: '送信済み'
+      },
+      pa: {
+        app_title: 'KT2 ਰਿਮੋਟ ਕੰਟਰੋਲ',
+        app_subtitle: 'ਬਰਾਊਜ਼ਰ ਤੋਂ Kungfu Turtle KT2 ਨੂੰ ਕੰਟਰੋਲ ਕਰਨ ਲਈ ਸਟੈਟਿਕ ਪੈਨਲ।',
+        language_label: 'ਭਾਸ਼ਾ',
+        connection_title: 'ਕਨੈਕਸ਼ਨ',
+        ping_button: '/py ਟੈਸਟ ਕਰੋ',
+        connection_note: 'ਜਦੋਂ ਇਹ KT2 ਸਰਵਰ ’ਤੇ ਹੀ ਚੱਲਦਾ ਹੈ ਤਾਂ ਪੈਨਲ relative calls ਵਰਤਦਾ ਹੈ।',
+        lights_title: 'ਲਾਈਟਾਂ',
+        color_label: 'ਰੰਗ',
+        brightness_label: 'ਲਾਜ਼ਿਕਲ ਚਮਕ (ਸਿਰਫ਼ ਦਿੱਖ ਲਈ)',
+        led_on: 'LED ਚਾਲੂ ਕਰੋ',
+        rainbow: 'ਇੰਦਰਧਨੁਸ਼',
+        led_off: 'ਬੰਦ ਕਰੋ',
+        quick_palette: 'ਤੁਰੰਤ ਪੈਲੈਟ',
+        sound_title: 'ਆਵਾਜ਼',
+        stop_buzzer: 'ਬਜ਼ਰ ਰੋਕੋ',
+        piano_label: 'ਪਿਆਨੋ',
+        music_custom: 'ਕਸਟਮ ਸੰਗੀਤ (car.buzzer.music)',
+        play_music: 'ਸੰਗੀਤ ਚਲਾਓ',
+        play_scale: 'ਸਕੇਲ',
+        movement_title: 'ਹਿਲਚਲ',
+        movement_help: 'ਤੁਰਨ ਅਤੇ ਮੁੜਨ ਲਈ arrow keys ਵਰਤੋ। ਤੁਸੀਂ arrow keys, space ਅਤੇ B ਵੀ ਵਰਤ ਸਕਦੇ ਹੋ।',
+        reset_pose: 'ਪੋਜ਼ ਰੀਸੈਟ',
+        actions_title: 'ਐਕਸ਼ਨ',
+        actions_help: 'actions ਮੋਡੀਊਲ ਦੀਆਂ ਆਮ ਕਾਰਵਾਈਆਂ ਵਾਲੇ compact ਬਟਨ।',
+        python_title: 'ਤੇਜ਼ Python',
+        python_label: '/py ਨੂੰ ਕੋਡ ਭੇਜੋ',
+        run_button: 'ਚਲਾਓ',
+        log_title: 'ਲਾਗ',
+        shortcuts_title: 'ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ',
+        shortcuts_html: '↑ ਅੱਗੇ ਵਧੋ<br>↓ ਪਿੱਛੇ ਜਾਓ<br>← ਖੱਬੇ ਮੁੜੋ<br>→ ਸੱਜੇ ਮੁੜੋ<br>space = ਰੋਕੋ<br>B = bark<br>F = back flip<br>R = ਪੋਜ਼ ਰੀਸੈਟ',
+        notes_title: 'ਨੋਟਸ',
+        notes_calls: 'ਕਾਲਾਂ ਕਿਵੇਂ ਬਣਦੀਆਂ ਹਨ',
+        notes_calls_body: 'ਇਹ ਪੰਨਾ embedded Python code ਚਲਾਉਣ ਲਈ /py endpoint ਵਰਤਦਾ ਹੈ, ਉਦਾਹਰਨ ਲਈ q.play(actions.back_flip(q), dly=0.1) ਜਾਂ car.led.on(0xff0000)।',
+        compatibility: 'ਅਨੁਕੂਲਤਾ',
+        compatibility_body: 'ਇਹ KT2 ਲਈ ਤੁਹਾਡੇ ਲੱਭੇ ਗੈਰ-ਅਧਿਕਾਰਕ APIs ਨਾਲ ਤਿਆਰ ਹੈ। ਕੁਝ actions firmware ਦੇ ਮੁਤਾਬਕ ਬਦਲ ਸਕਦੀਆਂ ਹਨ।',
+        ready: 'ਤਿਆਰ ਹੈ।',
+        saved: 'ਭਾਸ਼ਾ ਸੰਭਾਲੀ ਗਈ।',
+        sent: 'ਭੇਜਿਆ ਗਿਆ'
+      },
+      de: {
+        app_title: 'KT2 Fernsteuerung',
+        app_subtitle: 'Statisches Bedienfeld zur Steuerung des Kungfu Turtle KT2 im Browser.',
+        language_label: 'Sprache',
+        connection_title: 'Verbindung',
+        ping_button: '/py testen',
+        connection_note: 'Das Panel verwendet relative Aufrufe, wenn es direkt auf dem KT2-Server läuft.',
+        lights_title: 'Lichter',
+        color_label: 'Farbe',
+        brightness_label: 'Logische Helligkeit (nur visuell)',
+        led_on: 'LEDs einschalten',
+        rainbow: 'Regenbogen',
+        led_off: 'Ausschalten',
+        quick_palette: 'Schnellpalette',
+        sound_title: 'Ton',
+        stop_buzzer: 'Summer stoppen',
+        piano_label: 'Klavier',
+        music_custom: 'Benutzerdefinierte Musik (car.buzzer.music)',
+        play_music: 'Musik abspielen',
+        play_scale: 'Tonleiter',
+        movement_title: 'Bewegung',
+        movement_help: 'Pfeile zum Laufen und Drehen. Du kannst auch die Tastatur verwenden: Pfeile, Leertaste und B.',
+        reset_pose: 'Pose zurücksetzen',
+        actions_title: 'Aktionen',
+        actions_help: 'Kompakte Schaltflächen mit häufigen Aktionen aus dem actions-Modul.',
+        python_title: 'Schnelles Python',
+        python_label: 'Code an /py senden',
+        run_button: 'Ausführen',
+        log_title: 'Log',
+        shortcuts_title: 'Tastenkürzel',
+        shortcuts_html: '↑ vorwärts<br>↓ rückwärts<br>← links drehen<br>→ rechts drehen<br>Leertaste = stoppen<br>B = bark<br>F = back flip<br>R = Pose zurücksetzen',
+        notes_title: 'Hinweise',
+        notes_calls: 'Wie die Aufrufe funktionieren',
+        notes_calls_body: 'Die Seite verwendet den Endpoint /py, um eingebetteten Python-Code auszuführen, zum Beispiel q.play(actions.back_flip(q), dly=0.1) oder car.led.on(0xff0000).',
+        compatibility: 'Kompatibilität',
+        compatibility_body: 'Für den KT2 mit den inoffiziellen APIs vorbereitet, die du gefunden hast. Einige Aktionen können je nach Firmware variieren.',
+        ready: 'Bereit.',
+        saved: 'Sprache gespeichert.',
+        sent: 'gesendet'
+      },
+      jv: {
+        app_title: 'Kontrol Remote KT2',
+        app_subtitle: 'Panel statis kanggo ngontrol Kungfu Turtle KT2 saka browser.',
+        language_label: 'Basa',
+        connection_title: 'Sambungan',
+        ping_button: 'Tes /py',
+        connection_note: 'Panel iki nggunakake panggilan relatif nalika mlaku saka server KT2 dhewe.',
+        lights_title: 'Lampu',
+        color_label: 'Werna',
+        brightness_label: 'Padhang logis (mung visual)',
+        led_on: 'Uripake LED',
+        rainbow: 'Pelangi',
+        led_off: 'Pateni',
+        quick_palette: 'Palet cepet',
+        sound_title: 'Swara',
+        stop_buzzer: 'Mandhegake buzzer',
+        piano_label: 'Piano',
+        music_custom: 'Musik khusus (car.buzzer.music)',
+        play_music: 'Putar musik',
+        play_scale: 'Skala',
+        movement_title: 'Gerakan',
+        movement_help: 'Tombol panah kanggo mlaku lan muter. Sampeyan uga bisa nganggo keyboard: panah, spasi, lan B.',
+        reset_pose: 'Reset pose',
+        actions_title: 'Aksi',
+        actions_help: 'Tombol cilik nganggo aksi umum saka modul actions.',
+        python_title: 'Python cepet',
+        python_label: 'Kirim kode menyang /py',
+        run_button: 'Jalanke',
+        log_title: 'Log',
+        shortcuts_title: 'Trabasan keyboard',
+        shortcuts_html: '↑ maju<br>↓ mundur<br>← muter kiwa<br>→ muter tengen<br>spasi = mandheg<br>B = bark<br>F = back flip<br>R = reset pose',
+        notes_title: 'Cathetan',
+        notes_calls: 'Cara panggilan digawe',
+        notes_calls_body: 'Kaca iki nggunakake endpoint /py kanggo ngeksekusi kode Python sing ditanem, contone q.play(actions.back_flip(q), dly=0.1) utawa car.led.on(0xff0000).',
+        compatibility: 'Kompatibilitas',
+        compatibility_body: 'Wis disiapake kanggo KT2 nganggo API ora resmi sing sampeyan temokake. Sawetara aksi bisa beda gumantung firmware.',
+        ready: 'Siap.',
+        saved: 'Basa disimpen.',
+        sent: 'dikirim'
+      },
+      ko: {
+        app_title: 'KT2 원격 제어',
+        app_subtitle: '브라우저에서 Kungfu Turtle KT2를 제어하기 위한 정적 패널입니다.',
+        language_label: '언어',
+        connection_title: '연결',
+        ping_button: '/py 테스트',
+        connection_note: '이 패널은 KT2 서버 자체에서 실행될 때 상대 호출을 사용합니다.',
+        lights_title: '조명',
+        color_label: '색상',
+        brightness_label: '논리 밝기(시각적 전용)',
+        led_on: 'LED 켜기',
+        rainbow: '무지개',
+        led_off: '끄기',
+        quick_palette: '빠른 팔레트',
+        sound_title: '사운드',
+        stop_buzzer: '버저 정지',
+        piano_label: '피아노',
+        music_custom: '사용자 음악 (car.buzzer.music)',
+        play_music: '음악 재생',
+        play_scale: '음계',
+        movement_title: '이동',
+        movement_help: '걷기와 회전을 위해 방향키를 사용하세요. 키보드의 방향키, 스페이스, B도 사용할 수 있습니다.',
+        reset_pose: '자세 리셋',
+        actions_title: '동작',
+        actions_help: 'actions 모듈의 일반 동작이 들어 있는 컴팩트 버튼입니다.',
+        python_title: '빠른 Python',
+        python_label: '/py로 코드 보내기',
+        run_button: '실행',
+        log_title: '로그',
+        shortcuts_title: '키보드 단축키',
+        shortcuts_html: '↑ 전진<br>↓ 후진<br>← 좌회전<br>→ 우회전<br>스페이스 = 정지<br>B = bark<br>F = 백플립<br>R = 자세 리셋',
+        notes_title: '메모',
+        notes_calls: '호출 방식',
+        notes_calls_body: '이 페이지는 /py 엔드포인트를 사용해 내장 Python 코드를 실행합니다. 예: q.play(actions.back_flip(q), dly=0.1) 또는 car.led.on(0xff0000).',
+        compatibility: '호환성',
+        compatibility_body: '찾은 비공식 API를 사용하는 KT2용으로 준비되어 있습니다. 일부 동작은 펌웨어에 따라 달라질 수 있습니다.',
+        ready: '준비됨.',
+        saved: '언어가 저장되었습니다.',
+        sent: '전송됨'
+      },
+      fr: {
+        app_title: 'Télécommande KT2',
+        app_subtitle: 'Panneau statique pour contrôler le Kungfu Turtle KT2 depuis le navigateur.',
+        language_label: 'Langue',
+        connection_title: 'Connexion',
+        ping_button: 'Tester /py',
+        connection_note: 'Le panneau utilise des appels relatifs lorsqu’il est exécuté sur le serveur KT2 lui-même.',
+        lights_title: 'Lumières',
+        color_label: 'Couleur',
+        brightness_label: 'Luminosité logique (visuelle uniquement)',
+        led_on: 'Allumer les LED',
+        rainbow: 'Arc-en-ciel',
+        led_off: 'Éteindre',
+        quick_palette: 'Palette rapide',
+        sound_title: 'Son',
+        stop_buzzer: 'Arrêter le buzzer',
+        piano_label: 'Piano',
+        music_custom: 'Musique personnalisée (car.buzzer.music)',
+        play_music: 'Lire la musique',
+        play_scale: 'Gamme',
+        movement_title: 'Mouvement',
+        movement_help: 'Flèches pour marcher et tourner. Vous pouvez aussi utiliser le clavier : flèches, espace et B.',
+        reset_pose: 'Réinitialiser la posture',
+        actions_title: 'Actions',
+        actions_help: 'Boutons compacts avec les actions courantes du module actions.',
+        python_title: 'Python rapide',
+        python_label: 'Envoyer du code vers /py',
+        run_button: 'Exécuter',
+        log_title: 'Journal',
+        shortcuts_title: 'Raccourcis clavier',
+        shortcuts_html: '↑ avancer<br>↓ reculer<br>← tourner à gauche<br>→ tourner à droite<br>espace = arrêter<br>B = bark<br>F = back flip<br>R = réinitialiser la posture',
+        notes_title: 'Notes',
+        notes_calls: 'Comment les appels sont effectués',
+        notes_calls_body: 'La page utilise l’endpoint /py pour exécuter du code Python embarqué, par exemple q.play(actions.back_flip(q), dly=0.1) ou car.led.on(0xff0000).',
+        compatibility: 'Compatibilité',
+        compatibility_body: 'Préparé pour le KT2 avec les API non officielles que vous avez trouvées. Certaines actions peuvent varier selon le firmware.',
+        ready: 'Prêt.',
+        saved: 'Langue enregistrée.',
+        sent: 'envoyé'
+      },
+      te: {
+        app_title: 'KT2 రిమోట్ కంట్రోల్',
+        app_subtitle: 'బ్రౌజర్ నుండి Kungfu Turtle KT2 ను నియంత్రించడానికి స్థిర ప్యానెల్.',
+        language_label: 'భాష',
+        connection_title: 'కనెక్షన్',
+        ping_button: '/py పరీక్షించు',
+        connection_note: 'KT2 సర్వర్‌పైనే నడిచేటప్పుడు ఈ ప్యానెల్ relative calls ఉపయోగిస్తుంది.',
+        lights_title: 'లైట్లు',
+        color_label: 'రంగు',
+        brightness_label: 'తార్కిక ప్రకాశం (కేవలం దృశ్యమాత్రం)',
+        led_on: 'LEDలను ఆన్ చేయి',
+        rainbow: 'ఇంద్రధనస్సు',
+        led_off: 'ఆఫ్ చేయి',
+        quick_palette: 'త్వరిత పలెట్',
+        sound_title: 'శబ్దం',
+        stop_buzzer: 'బజర్ ఆపు',
+        piano_label: 'పియానో',
+        music_custom: 'కస్టమ్ మ్యూజిక్ (car.buzzer.music)',
+        play_music: 'సంగీతం ప్లే చేయి',
+        play_scale: 'స్కేలు',
+        movement_title: 'కదలిక',
+        movement_help: 'నడవడానికి, తిరగడానికి arrow keys వాడండి. keyboard లో arrows, space, B కూడా వాడవచ్చు.',
+        reset_pose: 'భంగిమ రీసెట్',
+        actions_title: 'చర్యలు',
+        actions_help: 'actions మాడ్యూల్‌లోని సాధారణ చర్యల కోసం కాంపాక్ట్ బటన్లు.',
+        python_title: 'త్వరిత Python',
+        python_label: '/py కు కోడ్ పంపు',
+        run_button: 'నిర్వహించు',
+        log_title: 'లాగ్',
+        shortcuts_title: 'కీబోర్డ్ షార్ట్‌కట్లు',
+        shortcuts_html: '↑ ముందుకు<br>↓ వెనక్కు<br>← ఎడమకు తిరుగు<br>→ కుడికి తిరుగు<br>space = ఆపు<br>B = bark<br>F = back flip<br>R = భంగిమ రీసెట్',
+        notes_title: 'గమనికలు',
+        notes_calls: 'కాళ్లు ఎలా పనిచేస్తాయి',
+        notes_calls_body: 'ఈ పేజీ embedded Python code నడపడానికి /py endpoint ఉపయోగిస్తుంది. ఉదాహరణకు q.play(actions.back_flip(q), dly=0.1) లేదా car.led.on(0xff0000).',
+        compatibility: 'అనుకూలత',
+        compatibility_body: 'మీరు కనుగొన్న అనధికార APIలతో KT2 కోసం ఇది సిద్ధంగా ఉంది. కొన్ని చర్యలు firmware ను బట్టి మారవచ్చు.',
+        ready: 'సిద్ధం.',
+        saved: 'భాష సేవ్ చేయబడింది.',
+        sent: 'పంపబడింది'
+      },
+      mr: {
+        app_title: 'KT2 रिमोट कंट्रोल',
+        app_subtitle: 'ब्राउझरमधून Kungfu Turtle KT2 नियंत्रित करण्यासाठी स्थिर पॅनेल.',
+        language_label: 'भाषा',
+        connection_title: 'कनेक्शन',
+        ping_button: '/py तपासा',
+        connection_note: 'KT2 सर्व्हरवर चालत असताना हे पॅनेल relative calls वापरते.',
+        lights_title: 'लाईट्स',
+        color_label: 'रंग',
+        brightness_label: 'तार्किक उजळपणा (फक्त दृश्य)',
+        led_on: 'LED सुरू करा',
+        rainbow: 'इंद्रधनुष्य',
+        led_off: 'बंद करा',
+        quick_palette: 'जलद पॅलेट',
+        sound_title: 'ध्वनी',
+        stop_buzzer: 'बझर थांबवा',
+        piano_label: 'पियानो',
+        music_custom: 'कस्टम संगीत (car.buzzer.music)',
+        play_music: 'संगीत वाजवा',
+        play_scale: 'स्केल',
+        movement_title: 'हालचाल',
+        movement_help: 'चालण्यासाठी आणि वळण्यासाठी बाण की वापरा. तुम्ही कीबोर्डवरील बाण, स्पेस आणि B सुद्धा वापरू शकता.',
+        reset_pose: 'पोझ रीसेट',
+        actions_title: 'क्रिया',
+        actions_help: 'actions मॉड्यूलमधील सामान्य क्रियांसाठी कॉम्पॅक्ट बटणे.',
+        python_title: 'जलद Python',
+        python_label: '/py ला कोड पाठवा',
+        run_button: 'चालवा',
+        log_title: 'लॉग',
+        shortcuts_title: 'कीबोर्ड शॉर्टकट',
+        shortcuts_html: '↑ पुढे जा<br>↓ मागे जा<br>← डावीकडे वळा<br>→ उजवीकडे वळा<br>space = थांबा<br>B = bark<br>F = back flip<br>R = पोझ रीसेट',
+        notes_title: 'नोंदी',
+        notes_calls: 'कॉल्स कशा केल्या जातात',
+        notes_calls_body: 'हे पृष्ठ embedded Python code चालवण्यासाठी /py endpoint वापरते, उदाहरणार्थ q.play(actions.back_flip(q), dly=0.1) किंवा car.led.on(0xff0000).',
+        compatibility: 'सुसंगतता',
+        compatibility_body: 'तुम्हाला सापडलेल्या अनौपचारिक APIंसह KT2 साठी हे तयार आहे. काही क्रिया firmware नुसार बदलू शकतात.',
+        ready: 'तयार.',
+        saved: 'भाषा जतन झाली.',
+        sent: 'पाठवले'
+      },
+      tr: {
+        app_title: 'KT2 Uzaktan Kumanda',
+        app_subtitle: 'Kungfu Turtle KT2’yi tarayıcıdan kontrol etmek için statik panel.',
+        language_label: 'Dil',
+        connection_title: 'Bağlantı',
+        ping_button: '/py test et',
+        connection_note: 'Panel, KT2 sunucusunun kendisinde çalıştığında göreli çağrılar kullanır.',
+        lights_title: 'Işıklar',
+        color_label: 'Renk',
+        brightness_label: 'Mantıksal parlaklık (yalnızca görsel)',
+        led_on: 'LED’leri aç',
+        rainbow: 'Gökkuşağı',
+        led_off: 'Kapat',
+        quick_palette: 'Hızlı palet',
+        sound_title: 'Ses',
+        stop_buzzer: 'Buzzer’ı durdur',
+        piano_label: 'Piyano',
+        music_custom: 'Özel müzik (car.buzzer.music)',
+        play_music: 'Müziği çal',
+        play_scale: 'Dizi',
+        movement_title: 'Hareket',
+        movement_help: 'Yürümek ve dönmek için ok tuşlarını kullanın. Klavyede oklar, boşluk ve B de kullanılabilir.',
+        reset_pose: 'Pozu sıfırla',
+        actions_title: 'Eylemler',
+        actions_help: 'actions modülündeki yaygın eylemler için kompakt düğmeler.',
+        python_title: 'Hızlı Python',
+        python_label: 'Kodu /py’ye gönder',
+        run_button: 'Çalıştır',
+        log_title: 'Kayıt',
+        shortcuts_title: 'Klavye kısayolları',
+        shortcuts_html: '↑ ileri<br>↓ geri<br>← sola dön<br>→ sağa dön<br>boşluk = dur<br>B = bark<br>F = back flip<br>R = pozu sıfırla',
+        notes_title: 'Notlar',
+        notes_calls: 'Çağrılar nasıl yapılır',
+        notes_calls_body: 'Bu sayfa, gömülü Python kodunu çalıştırmak için /py endpoint’ini kullanır; örneğin q.play(actions.back_flip(q), dly=0.1) veya car.led.on(0xff0000).',
+        compatibility: 'Uyumluluk',
+        compatibility_body: 'Bulduğunuz resmi olmayan API’lerle KT2 için hazırlanmıştır. Bazı eylemler firmware’e göre değişebilir.',
+        ready: 'Hazır.',
+        saved: 'Dil kaydedildi.',
+        sent: 'gönderildi'
+      },
+      ta: {
+        app_title: 'KT2 ரிமோட் கட்டுப்பாடு',
+        app_subtitle: 'உலாவியில் இருந்து Kungfu Turtle KT2 ஐ கட்டுப்படுத்த நிலையான பலகம்.',
+        language_label: 'மொழி',
+        connection_title: 'இணைப்பு',
+        ping_button: '/py சோதிக்க',
+        connection_note: 'KT2 சர்வரிலேயே இயங்கும் போது இந்த பலகம் relative calls பயன்படுத்துகிறது.',
+        lights_title: 'விளக்குகள்',
+        color_label: 'நிறம்',
+        brightness_label: 'தருக்க பிரகாசம் (காட்சி மட்டும்)',
+        led_on: 'LED ஐ ஆன் செய்',
+        rainbow: 'வானவில்',
+        led_off: 'ஆஃப் செய்',
+        quick_palette: 'வேக நிறத் தொகுப்பு',
+        sound_title: 'ஒலி',
+        stop_buzzer: 'பஸ்ஸரை நிறுத்து',
+        piano_label: 'பியானோ',
+        music_custom: 'தனிப்பயன் இசை (car.buzzer.music)',
+        play_music: 'இசை இயக்கு',
+        play_scale: 'ஸ்கேல்',
+        movement_title: 'நகர்வு',
+        movement_help: 'நடக்கவும் திரும்பவும் அம்புக்குறி விசைகளைப் பயன்படுத்தவும். விசைப்பலகையில் arrows, space மற்றும் B-யும் பயன்படுத்தலாம்.',
+        reset_pose: 'நிலைமையை மீட்டமை',
+        actions_title: 'செயல்கள்',
+        actions_help: 'actions module இன் பொதுவான செயல்களுக்கான சுருக்கமான பொத்தான்கள்.',
+        python_title: 'விரைவு Python',
+        python_label: '/py க்கு குறியீட்டை அனுப்பு',
+        run_button: 'இயக்கு',
+        log_title: 'பதிவு',
+        shortcuts_title: 'விசைப்பலகை குறுக்குவழிகள்',
+        shortcuts_html: '↑ முன்னேறு<br>↓ பின்னேறு<br>← இடப்பக்கம் திரு<br>→ வலப்பக்கம் திரு<br>space = நில்<br>B = bark<br>F = back flip<br>R = நிலையை மீட்டமை',
+        notes_title: 'குறிப்புகள்',
+        notes_calls: 'அழைப்புகள் எப்படி செயல்படுகின்றன',
+        notes_calls_body: 'இந்த பக்கம் embedded Python code ஐ இயக்க /py endpoint ஐ பயன்படுத்துகிறது. உதாரணமாக q.play(actions.back_flip(q), dly=0.1) அல்லது car.led.on(0xff0000).',
+        compatibility: 'இணக்கத் தன்மை',
+        compatibility_body: 'நீங்கள் கண்டுபிடித்த அதிகாரப்பூர்வமற்ற API களுடன் KT2 க்கு இது தயாராக உள்ளது. சில செயல்கள் firmware ஐப் பொறுத்து மாறலாம்.',
+        ready: 'தயார்.',
+        saved: 'மொழி சேமிக்கப்பட்டது.',
+        sent: 'அனுப்பப்பட்டது'
+      },
+      vi: {
+        app_title: 'Điều khiển từ xa KT2',
+        app_subtitle: 'Bảng điều khiển tĩnh để điều khiển Kungfu Turtle KT2 từ trình duyệt.',
+        language_label: 'Ngôn ngữ',
+        connection_title: 'Kết nối',
+        ping_button: 'Kiểm tra /py',
+        connection_note: 'Bảng điều khiển dùng các lời gọi tương đối khi chạy trên chính máy chủ KT2.',
+        lights_title: 'Đèn',
+        color_label: 'Màu',
+        brightness_label: 'Độ sáng logic (chỉ hiển thị)',
+        led_on: 'Bật LED',
+        rainbow: 'Cầu vồng',
+        led_off: 'Tắt',
+        quick_palette: 'Bảng màu nhanh',
+        sound_title: 'Âm thanh',
+        stop_buzzer: 'Dừng còi',
+        piano_label: 'Piano',
+        music_custom: 'Nhạc tùy chỉnh (car.buzzer.music)',
+        play_music: 'Phát nhạc',
+        play_scale: 'Âm giai',
+        movement_title: 'Di chuyển',
+        movement_help: 'Dùng phím mũi tên để đi và rẽ. Bạn cũng có thể dùng bàn phím: mũi tên, phím cách và B.',
+        reset_pose: 'Đặt lại tư thế',
+        actions_title: 'Hành động',
+        actions_help: 'Các nút gọn với những hành động phổ biến của mô-đun actions.',
+        python_title: 'Python nhanh',
+        python_label: 'Gửi mã tới /py',
+        run_button: 'Chạy',
+        log_title: 'Nhật ký',
+        shortcuts_title: 'Phím tắt',
+        shortcuts_html: '↑ tiến lên<br>↓ lùi lại<br>← rẽ trái<br>→ rẽ phải<br>space = dừng<br>B = bark<br>F = back flip<br>R = đặt lại tư thế',
+        notes_title: 'Ghi chú',
+        notes_calls: 'Cách các lời gọi hoạt động',
+        notes_calls_body: 'Trang này dùng endpoint /py để thực thi mã Python nhúng, ví dụ q.play(actions.back_flip(q), dly=0.1) hoặc car.led.on(0xff0000).',
+        compatibility: 'Tương thích',
+        compatibility_body: 'Được chuẩn bị cho KT2 với các API không chính thức mà bạn đã tìm thấy. Một số hành động có thể thay đổi tùy firmware.',
+        ready: 'Sẵn sàng.',
+        saved: 'Đã lưu ngôn ngữ.',
+        sent: 'đã gửi'
+      },
+      ur: {
+        app_title: 'KT2 ریموٹ کنٹرول',
+        app_subtitle: 'براؤزر سے Kungfu Turtle KT2 کو کنٹرول کرنے کے لیے ایک ساکن پینل۔',
+        language_label: 'زبان',
+        connection_title: 'کنکشن',
+        ping_button: '/py آزمائیں',
+        connection_note: 'یہ پینل KT2 سرور پر چلنے کی صورت میں relative calls استعمال کرتا ہے۔',
+        lights_title: 'لائٹس',
+        color_label: 'رنگ',
+        brightness_label: 'منطقی چمک (صرف ظاہری)',
+        led_on: 'LED آن کریں',
+        rainbow: 'قوسِ قزح',
+        led_off: 'بند کریں',
+        quick_palette: 'فوری پیلیٹ',
+        sound_title: 'آواز',
+        stop_buzzer: 'بزر روکیں',
+        piano_label: 'پیانو',
+        music_custom: 'کسٹم موسیقی (car.buzzer.music)',
+        play_music: 'موسیقی چلائیں',
+        play_scale: 'اسکیل',
+        movement_title: 'حرکت',
+        movement_help: 'چلنے اور مڑنے کے لیے تیر والے بٹن استعمال کریں۔ آپ کی بورڈ کے arrows، space اور B بھی استعمال کر سکتے ہیں۔',
+        reset_pose: 'پوز ری سیٹ',
+        actions_title: 'ایکشنز',
+        actions_help: 'actions ماڈیول کی عام کارروائیوں کے لیے compact بٹن۔',
+        python_title: 'فوری Python',
+        python_label: '/py کو کوڈ بھیجیں',
+        run_button: 'چلائیں',
+        log_title: 'لاگ',
+        shortcuts_title: 'کی بورڈ شارٹ کٹس',
+        shortcuts_html: '↑ آگے<br>↓ پیچھے<br>← بائیں مڑیں<br>→ دائیں مڑیں<br>space = رکیں<br>B = bark<br>F = back flip<br>R = پوز ری سیٹ',
+        notes_title: 'نوٹس',
+        notes_calls: 'کالز کیسے کی جاتی ہیں',
+        notes_calls_body: 'یہ صفحہ embedded Python code چلانے کے لیے /py endpoint استعمال کرتا ہے، مثلاً q.play(actions.back_flip(q), dly=0.1) یا car.led.on(0xff0000).',
+        compatibility: 'مطابقت',
+        compatibility_body: 'یہ KT2 کے لیے ان غیر سرکاری APIs کے ساتھ تیار ہے جو آپ نے تلاش کی ہیں۔ کچھ actions firmware کے مطابق مختلف ہو سکتی ہیں۔',
+        ready: 'تیار۔',
+        saved: 'زبان محفوظ ہو گئی۔',
+        sent: 'بھیجا گیا'
+      },
+      ca: {
+        app_title: 'Control remot KT2',
+        app_subtitle: 'Panell estàtic per controlar el Kungfu Turtle KT2 des del navegador.',
+        language_label: 'Idioma',
+        connection_title: 'Connexió',
+        ping_button: 'Provar /py',
+        connection_note: 'El panell fa servir crides relatives quan s’executa des del mateix servidor del KT2.',
+        lights_title: 'Llums',
+        color_label: 'Color',
+        brightness_label: 'Brillantor lògica (només visual)',
+        led_on: 'Encendre LEDs',
+        rainbow: 'Arc de Sant Martí',
+        led_off: 'Apagar',
+        quick_palette: 'Paleta ràpida',
+        sound_title: 'So',
+        stop_buzzer: 'Aturar brunzidor',
+        piano_label: 'Piano',
+        music_custom: 'Música personalitzada (car.buzzer.music)',
+        play_music: 'Reproduir música',
+        play_scale: 'Escala',
+        movement_title: 'Moviment',
+        movement_help: 'Fletxes per caminar i girar. També pots fer servir el teclat: fletxes, espai i B.',
+        reset_pose: 'Reiniciar postura',
+        actions_title: 'Accions',
+        actions_help: 'Botons compactes amb accions comunes del mòdul actions.',
+        python_title: 'Python ràpid',
+        python_label: 'Enviar codi a /py',
+        run_button: 'Executar',
+        log_title: 'Registre',
+        shortcuts_title: 'Dreceres de teclat',
+        shortcuts_html: '↑ avançar<br>↓ retrocedir<br>← girar a l’esquerra<br>→ girar a la dreta<br>espai = parar<br>B = bark<br>F = back flip<br>R = reiniciar postura',
+        notes_title: 'Notes',
+        notes_calls: 'Com es fan les crides',
+        notes_calls_body: 'La pàgina fa servir l’endpoint /py per executar codi Python incrustat, per exemple q.play(actions.back_flip(q), dly=0.1) o car.led.on(0xff0000).',
+        compatibility: 'Compatibilitat',
+        compatibility_body: 'Està preparat per al KT2 amb les APIs no oficials que has trobat. Algunes accions poden variar segons el firmware.',
+        ready: 'A punt.',
+        saved: 'Idioma desat.',
+        sent: 'enviat'
+      },
+      gl: {
+        app_title: 'Control remoto KT2',
+        app_subtitle: 'Panel estático para controlar o Kungfu Turtle KT2 desde o navegador.',
+        language_label: 'Idioma',
+        connection_title: 'Conexión',
+        ping_button: 'Probar /py',
+        connection_note: 'O panel usa chamadas relativas ao executarse desde o propio servidor do KT2.',
+        lights_title: 'Luces',
+        color_label: 'Cor',
+        brightness_label: 'Brillo lóxico (só visual)',
+        led_on: 'Acender LEDs',
+        rainbow: 'Arco da vella',
+        led_off: 'Apagar',
+        quick_palette: 'Paleta rápida',
+        sound_title: 'Son',
+        stop_buzzer: 'Parar zumbador',
+        piano_label: 'Piano',
+        music_custom: 'Música personalizada (car.buzzer.music)',
+        play_music: 'Reproducir música',
+        play_scale: 'Escala',
+        movement_title: 'Movemento',
+        movement_help: 'Frechas para camiñar e xirar. Tamén podes usar o teclado: frechas, espazo e B.',
+        reset_pose: 'Reiniciar postura',
+        actions_title: 'Accións',
+        actions_help: 'Botóns compactos con accións comúns do módulo actions.',
+        python_title: 'Python rápido',
+        python_label: 'Enviar código a /py',
+        run_button: 'Executar',
+        log_title: 'Rexistro',
+        shortcuts_title: 'Atallos de teclado',
+        shortcuts_html: '↑ avanzar<br>↓ retroceder<br>← xirar á esquerda<br>→ xirar á dereita<br>espazo = parar<br>B = bark<br>F = back flip<br>R = reiniciar postura',
+        notes_title: 'Notas',
+        notes_calls: 'Como están feitas as chamadas',
+        notes_calls_body: 'A páxina usa o endpoint /py para executar código Python embebido, por exemplo q.play(actions.back_flip(q), dly=0.1) ou car.led.on(0xff0000).',
+        compatibility: 'Compatibilidade',
+        compatibility_body: 'Está preparada para o KT2 coas APIs non oficiais que atopaches. Algunhas accións poden variar segundo o firmware.',
+        ready: 'Listo.',
+        saved: 'Idioma gardado.',
+        sent: 'enviado'
+      },
+      eu: {
+        app_title: 'KT2 urruneko kontrola',
+        app_subtitle: 'Kungfu Turtle KT2 nabigatzailetik kontrolatzeko panel estatikoa.',
+        language_label: 'Hizkuntza',
+        connection_title: 'Konexioa',
+        ping_button: '/py probatu',
+        connection_note: 'Panel honek dei erlatiboak erabiltzen ditu KT2 zerbitzarian bertan exekutatzen denean.',
+        lights_title: 'Argiak',
+        color_label: 'Kolorea',
+        brightness_label: 'Distira logikoa (bisuala bakarrik)',
+        led_on: 'LEDak piztu',
+        rainbow: 'Ortzadarra',
+        led_off: 'Itzali',
+        quick_palette: 'Paleta azkarra',
+        sound_title: 'Soinua',
+        stop_buzzer: 'Buzzerra gelditu',
+        piano_label: 'Pianoa',
+        music_custom: 'Musika pertsonalizatua (car.buzzer.music)',
+        play_music: 'Musika erreproduzitu',
+        play_scale: 'Eskala',
+        movement_title: 'Mugimendua',
+        movement_help: 'Geziak ibiltzeko eta biratzeko. Teklatua ere erabil dezakezu: geziak, zuriunea eta B.',
+        reset_pose: 'Jarrera berrezarri',
+        actions_title: 'Ekintzak',
+        actions_help: 'actions moduluko ekintza arruntak dituzten botoi trinkoak.',
+        python_title: 'Python azkarra',
+        python_label: 'Kodea /py-ra bidali',
+        run_button: 'Exekutatu',
+        log_title: 'Erregistroa',
+        shortcuts_title: 'Teklatu lasterbideak',
+        shortcuts_html: '↑ aurrera<br>↓ atzera<br>← ezkerrera biratu<br>→ eskuinera biratu<br>zuriunea = gelditu<br>B = bark<br>F = back flip<br>R = jarrera berrezarri',
+        notes_title: 'Oharrak',
+        notes_calls: 'Nola egiten diren deiak',
+        notes_calls_body: 'Orrialde honek /py endpoint-a erabiltzen du txertatutako Python kodea exekutatzeko; adibidez, q.play(actions.back_flip(q), dly=0.1) edo car.led.on(0xff0000).',
+        compatibility: 'Bateragarritasuna',
+        compatibility_body: 'Aurkitu dituzun API ez-ofizialekin KT2rako prestatuta dago. Ekintza batzuk firmwarearen arabera alda daitezke.',
+        ready: 'Prest.',
+        saved: 'Hizkuntza gorde da.',
+        sent: 'bidalia'
+      }
+    };
+
+    const fallbackBaseLang = 'en';
+
+    function getCurrentLanguage() {
+      return localStorage.getItem('kt2_lang') || 'es';
+    }
+
+    function t(key) {
+      const lang = getCurrentLanguage();
+      return translations[lang]?.[key] ?? translations[fallbackBaseLang]?.[key] ?? key;
+    }
+
+    function applyTranslations() {
+      const lang = getCurrentLanguage();
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach((node) => {
+        const key = node.dataset.i18n;
+        node.textContent = t(key);
+      });
+
+      document.querySelectorAll('[data-i18n-html]').forEach((node) => {
+        const key = node.dataset.i18nHtml;
+        node.innerHTML = t(key);
+      });
+
+      setStatus(t('ready'));
+    }
+
+    function saveLanguage(lang) {
+      localStorage.setItem('kt2_lang', lang);
+      applyTranslations();
+      setStatus(t('saved'));
     }
 
     function setStatus(msg, isError = false) {
@@ -405,18 +1412,12 @@ car.led.on(0x00ffff)</textarea>
       logEl.textContent = `[${ts}] ${msg}\n` + logEl.textContent;
     }
 
-    function saveBase() {
-      localStorage.setItem('kt2_base', getBaseUrl());
-      setStatus('IP guardada.');
-    }
-
     function hexColorToInt(hex) {
       return '0x' + hex.replace('#', '').toLowerCase();
     }
 
     async function sendPython(code, label = 'python') {
-      const base = getBaseUrl();
-      const url = `${base}/py`;
+      const url = '/py';
       log(`→ ${label}: ${code}`);
       try {
         const body = new URLSearchParams({ code });
@@ -426,7 +1427,7 @@ car.led.on(0x00ffff)</textarea>
           body: body.toString()
         });
         const text = await res.text();
-        setStatus(`${label} enviado (${res.status})` + (text ? ` · ${text.slice(0, 120)}` : ''));
+        setStatus(`${label} ${t('sent')} (${res.status})` + (text ? ` · ${text.slice(0, 120)}` : ''));
         log(`← ${res.status} ${text.slice(0, 300)}`);
         return text;
       } catch (err) {
@@ -452,7 +1453,8 @@ car.led.on(0x00ffff)</textarea>
 
     async function setLedColor(hex) {
       const color = hexColorToInt(hex);
-      await sendPython(`import car\ncar.led.on(${color})`, `led:${hex}`);
+      const code = `import car\ncolor=${color}\ncar.led.on([color] * 10)`;
+      await sendPython(code, `led:${hex}`);
     }
 
     async function ledOff() {
@@ -505,7 +1507,11 @@ car.led.on(0x00ffff)</textarea>
     }
 
     function bindEvents() {
-      el('saveIpBtn').addEventListener('click', saveBase);
+      const currentLang = getCurrentLanguage();
+      languageSelect.value = translations[currentLang] ? currentLang : 'es';
+
+      languageSelect.addEventListener('change', (e) => saveLanguage(e.target.value));
+
       el('pingBtn').addEventListener('click', () => sendPython('print("pong")', 'ping'));
       el('setColorBtn').addEventListener('click', () => setLedColor(el('colorPicker').value));
       el('ledOffBtn').addEventListener('click', ledOff);
@@ -547,6 +1553,7 @@ car.led.on(0x00ffff)</textarea>
     createActions();
     createPiano();
     bindEvents();
+    applyTranslations();
     log('Interfaz lista.');
   </script>
 </body>
