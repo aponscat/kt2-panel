@@ -201,6 +201,38 @@
     }
     summary { cursor: pointer; font-weight: 600; }
 
+    .battery-widget {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .battery-label {
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .battery-bar-wrap {
+      width: 80px;
+      height: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .battery-bar {
+      height: 100%;
+      border-radius: 5px;
+      width: 0%;
+      transition: width 0.6s ease, background-color 0.6s ease;
+    }
+    .battery-pct {
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 38px;
+      color: var(--text);
+    }
+
     @media (max-width: 1380px) {
       .wrap { padding: 16px; }
       .grid {
@@ -260,6 +292,13 @@
         <p data-i18n="app_subtitle">Panel estático para controlar el Kungfu Turtle KT2 desde el navegador.</p>
       </div>
       <div class="top-tools">
+        <div class="battery-widget" id="batteryWidget" style="display:none">
+          <span class="battery-label" data-i18n="battery_label">Batería</span>
+          <div class="battery-bar-wrap">
+            <div class="battery-bar" id="batteryBar"></div>
+          </div>
+          <span class="battery-pct" id="batteryPct">–</span>
+        </div>
         <div>
           <label for="languageSelect" data-i18n="language_label">Idioma</label>
           <select id="languageSelect">
@@ -508,6 +547,7 @@ car.led.on(0x00ffff)</textarea>
         notes_calls_body: 'La página usa el endpoint /py para ejecutar código Python embebido, por ejemplo q.play(actions.back_flip(q), dly=0.1) o car.led.on(0xff0000).',
         compatibility: 'Compatibilidad',
         compatibility_body: 'Está preparada para el KT2 con las APIs no oficiales que has encontrado. Algunas acciones pueden variar según firmware.',
+        battery_label: 'Batería',
         ready: 'Listo.',
         saved: 'Idioma guardado.',
         sent: 'enviado'
@@ -548,6 +588,7 @@ car.led.on(0x00ffff)</textarea>
         notes_calls_body: 'This page uses the /py endpoint to execute embedded Python code, for example q.play(actions.back_flip(q), dly=0.1) or car.led.on(0xff0000).',
         compatibility: 'Compatibility',
         compatibility_body: 'Prepared for KT2 with the unofficial APIs you found. Some actions may vary depending on firmware.',
+        battery_label: 'Battery',
         ready: 'Ready.',
         saved: 'Language saved.',
         sent: 'sent'
@@ -1575,12 +1616,38 @@ car.led.on(0x00ffff)</textarea>
       });
     }
 
+    async function fetchBattery() {
+      try {
+        await fetch('/py', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'code=' + encodeURIComponent('import car\nprint("BAT:" + str(car.battery.val()))')
+        });
+        await new Promise(r => setTimeout(r, 700));
+        const res = await fetch('/log');
+        const text = await res.text();
+        const m = text.match(/BAT:(\d+)/);
+        if (!m) return;
+        const mv = parseInt(m[1]);
+        const pct = Math.max(0, Math.min(100, Math.round((mv - 3200) / 1000 * 100)));
+        const bar = el('batteryBar');
+        const pctEl = el('batteryPct');
+        bar.style.width = pct + '%';
+        bar.style.background = pct > 75 ? 'var(--ok)' : pct > 20 ? 'var(--warn)' : 'var(--danger)';
+        pctEl.textContent = pct + '%';
+        pctEl.title = mv + ' mV';
+        el('batteryWidget').style.display = 'flex';
+      } catch(e) {}
+    }
+
     createPalette();
     createActions();
     createPiano();
     bindEvents();
     applyTranslations();
     log('Interfaz lista.');
+    fetchBattery();
+    setInterval(fetchBattery, 10000);
   </script>
 </body>
 </html>
