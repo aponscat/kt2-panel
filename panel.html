@@ -201,11 +201,6 @@
     }
     summary { cursor: pointer; font-weight: 600; }
 
-    @media (max-width: 1150px) {
-      .grid { grid-template-columns: 1fr; }
-      .header { align-items: flex-start; }
-    }
-
     @media (max-width: 1380px) {
       .wrap { padding: 16px; }
       .grid {
@@ -216,6 +211,11 @@
       }
     }
 
+    @media (max-width: 1150px) {
+      .grid { grid-template-columns: 1fr; }
+      .header { align-items: flex-start; }
+    }
+
     @media (max-width: 900px) {
       .palette { grid-template-columns: repeat(4, 1fr); }
       .piano { grid-template-columns: repeat(4, 1fr); }
@@ -223,6 +223,32 @@
         grid-template-columns: 64px 64px 64px;
         grid-template-rows: 64px 64px 64px;
       }
+    }
+
+    @media (max-width: 520px) {
+      .wrap { padding: 10px; }
+      .grid { gap: 10px; }
+      .stack { gap: 10px; }
+      .panel { padding: 14px; }
+      h1 { font-size: 1.3rem; }
+      h2 { font-size: 1rem; }
+      .header { gap: 10px; margin-bottom: 12px; }
+      .color-tools .row { flex-direction: column; }
+      .color-tools .row > * { flex: none; width: 100%; }
+      .piano { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .key { min-height: 80px; font-size: 13px; }
+      .actions-grid {
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 6px;
+      }
+      .actions-grid button { font-size: 12px; min-height: 38px; padding: 7px 8px; }
+      .dpad {
+        grid-template-columns: 60px 60px 60px;
+        grid-template-rows: 60px 60px 60px;
+        gap: 8px;
+      }
+      .log { max-height: 180px; font-size: 11px; }
+      .row { gap: 8px; }
     }
   </style>
 </head>
